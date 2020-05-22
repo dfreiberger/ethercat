@@ -32,8 +32,11 @@ pub struct Domain<'m> {
 
 impl Master {
     pub fn reserve(index: MasterIndex) -> Result<Self> {
+        
         let devpath = format!("/dev/EtherCAT{}", index);
+        
         let file = OpenOptions::new().read(true).write(true).open(&devpath)?;
+        
         let mut module_info = ec::ec_ioctl_module_t::default();
         let master = Master {
             file,
@@ -51,7 +54,9 @@ impl Master {
                 ),
             ))
         } else {
+            println!("2...");
             ioctl!(master, ec::ioctl::REQUEST)?;
+            println!("3...");
             Ok(master)
         }
     }
@@ -303,6 +308,7 @@ impl Master {
             slave_position: position,
             sdo_index: sdo_index.index,
             sdo_entry_subindex: sdo_index.subindex,
+            complete_access: 0,
             target_size: target.len() as u64,
             target: target.as_mut_ptr(),
             data_size: 0,
